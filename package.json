@@ -1,0 +1,29 @@
+{
+  "name": "generator",
+  "version": "1.0.0",
+  "description": "Generator for angular",
+  "main": "server.js",
+  "keywords": ["gulpplugin"],
+  "repository": {
+    "type": "",
+    "url": ""
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "mkdirp": "^0.5.1",
+    "gulp-connect": "^5.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.1"
+  },
+  "bin": {
+    "ozer":"./src/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon ./src/server.js"
+  },
+  "author": "ezzabuzaid",
+  "license": "MIT"
+}

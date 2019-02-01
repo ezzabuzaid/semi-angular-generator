@@ -13,7 +13,11 @@ function initFormField(fieldList) {
 function checkFieldType(field) {
 
   let fieldWrapper = html => `<div class="col-12">${html}</div>`;
-  let matFieldWrapper = html => `<mat-form-field appearance=${field.appearance}>${html}</mat-form-field>`;
+  let matFieldWrapper = html =>
+    `<mat-form-field appearance="${field.appearance}">
+        ${html}
+    </mat-form-field>`;
+
   // change the switch statement to 
   // {
   //   [wrapper](field){}
@@ -39,11 +43,11 @@ function CONTROL_SELECT({ type, name, placeholder }) {
           </mat-select>`
 };
 
-function CONTROL_TEXT({  name, placeholder }) {
+function CONTROL_TEXT({ name, placeholder }) {
   return `<input matInput type="text" formControlName="${name}" placeholder="${placeholder}" />`
 };
 
-function CONTROL_RADIO({  name, placeholder }) {
+function CONTROL_RADIO({ name, placeholder }) {
   return `<mat-label>${placeholder}</mat-label>
             <mat-radio-group formControlName="${name}">
             <mat-radio-button *ngFor="let box of boxes">{{ box }}</mat-radio-button>

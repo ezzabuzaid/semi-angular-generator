@@ -2,11 +2,12 @@
 
 const opn = require('opn');
 const { initExpress } = require('./app');
+const program = require('commander');
 
 function openBrowser(host) {
     return opn(`http://${host}`);
 }
-
+// commander used instead
 function parseArgs() {
     const [, , ...argv] = process.argv;
     const argsAsObject = {};
@@ -17,6 +18,7 @@ function parseArgs() {
     return argsAsObject;
 }
 
+// commander used instead
 function utilizeArgs() {
     const input = arguments[0];
     const requiredKeys = ['path'];
@@ -31,20 +33,18 @@ function utilizeArgs() {
     return input;
 }
 
-(async function start() {
+async function start(path) {
     try {
-        const args = utilizeArgs(parseArgs());
-        const server = await initExpress(args.path);
+        const server = await initExpress(path);
         await openBrowser(`${server.host}:${server.port}`);
     } catch (error) {
         console.error(error);
     }
-}());
+};
 
-// var gulp = require('gulp');
-// require('./gulpfile');
-
-// if (gulp.tasks.test) { 
-//     console.log('gulpfile contains task!');
-//     gulp.start('test');
-// }
+program
+    .option('-p, --path <required>', 'The path where the file will be generated')
+    .action(({ path }) => {
+        start(path);
+    })
+    .parse(process.argv);

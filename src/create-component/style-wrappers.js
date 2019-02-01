@@ -1,17 +1,15 @@
 const author = `
     <!--
 
-
         Create with Ozer Generator |
         ezzabuzaid |
         email: ezzabuzaid@hotmail.com |
-
 
     -->
 `
 
 module.exports.wrap = (content) => {
-    return `Semi
+    return `
     ${author}
   <div class="container">
     <div class="row">

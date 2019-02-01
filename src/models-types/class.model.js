@@ -1,4 +1,4 @@
-const { letterAtOneToUpperCase } = require('../utils/utils');
+const { letterAtOneToUpperCase, pipe, toCamelCase } = require('../utils/utils');
 const { angularImports, modelName, formModelImport, classHeader } = require('../utils/imports');
 const { createValidation } = require('.././utils/validations');
 
@@ -17,11 +17,14 @@ const createFormBuilderClass = (fields) => {
     }, '');
 }
 
-function createFormBuilderModel({ componentName, fields }) {
-
+function createFormBuilderModel({ name, fields }) {
+    const className = pipe(
+        toCamelCase,
+        letterAtOneToUpperCase
+    )(name);
     const content = `
     ${angularImports('forms', 'Validators')}
-    ${classHeader(modelName(letterAtOneToUpperCase(componentName)))}
+    ${classHeader(modelName(className))}
     {
         ${createFormBuilderClass(fields)}
     }`;

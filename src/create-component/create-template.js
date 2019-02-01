@@ -7,24 +7,13 @@ function createComponentTemplate({ fields }) {
 }
 
 function initFormField(fieldList) {
-  return orderTheFieldDependOnTheirIndex(fieldList)
-    .reduce((acc, curr) => {
-      return acc += checkFieldType(curr);
-    }, ``);
-}
-
-function orderTheFieldDependOnTheirIndex(curr) {
-
-  const list = Object.values(curr);
-
-  return list.sort((a, b) => a.index - b.index);
-
+  return fieldList.reduce((acc, curr) => acc += checkFieldType(curr), ``);
 }
 
 function checkFieldType(field) {
 
   let fieldWrapper = html => `<div class="col-12">${html}</div>`;
-  let matFieldWrapper = html => `<mat-form-field>${html}<mat-form-field>`;
+  let matFieldWrapper = html => `<mat-form-field appearance=${field.appearance}>${html}</mat-form-field>`;
   // change the switch statement to 
   // {
   //   [wrapper](field){}
@@ -41,28 +30,28 @@ function checkFieldType(field) {
   }
 }
 
-function CONTROL_SELECT({ type, controlName, placeholder }) {
+function CONTROL_SELECT({ type, name, placeholder }) {
 
   let multiple = type === 'multiple' ? 'multiple' : '';
 
-  return `<mat-select ${multiple} formControlName="${controlName}" placeholder="${placeholder}">
+  return `<mat-select ${multiple} formControlName="${name}" placeholder="${placeholder}">
             <mat-option *ngFor="let option of options" [value]="option">{{ option }}</mat-option>
           </mat-select>`
 };
 
-function CONTROL_TEXT({ type, controlName, placeholder }) {
-  return `<input matInput type="text" formControlName="${controlName}" placeholder="${placeholder}" />`
+function CONTROL_TEXT({  name, placeholder }) {
+  return `<input matInput type="text" formControlName="${name}" placeholder="${placeholder}" />`
 };
 
-function CONTROL_RADIO({ type, controlName, placeholder }) {
+function CONTROL_RADIO({  name, placeholder }) {
   return `<mat-label>${placeholder}</mat-label>
-            <mat-radio-group formControlName="${controlName}">
+            <mat-radio-group formControlName="${name}">
             <mat-radio-button *ngFor="let box of boxes">{{ box }}</mat-radio-button>
           </mat-radio-group>`
 };
 
-function CONTROL_CHECKBOX({ type, controlName, placeholder }) {
-  return `<mat-checkbox  formControlName="${controlName}">{{ control.placeholder }}</mat-checkbox>`
+function CONTROL_CHECKBOX({ name, placeholder }) {
+  return `<mat-checkbox  formControlName="${name}">${control.placeholder}</mat-checkbox>`
 };
 
 module.exports = {

@@ -2,45 +2,29 @@ const fs = require('fs');
 const mkdirp = require('mkdirp');
 const path = require('path');
 
-/**
- * 
- * @param {String} value change the first char to Cabital latter 
- */
-const letterAtOneToUpperCase = (value) => value.charAt(0).toUpperCase() + value.slice(1);
-/**
- * 
- * @param  {...any} selectedPath join path to with setted base path 
- */
-const pathToFolder = (...selectedPath) => path.join(process.cwd(), ...selectedPath);
-/**
- * 
- * @param {*} an object contain final folder path, file name and it's content 
- * @param {*} cb a function that will invoked directly after the file writed correctly
- */
-const writeFile = ({ folderPath, fileName, content }, cb) => {
-  // * split last chunk from folderPath, it's the folder that contain the file
-  const inFolderPath = folderPath.split('\\').slice(-1).join('');
-  console.log(inFolderPath);
-  // * write the created file to the recived path
+exports.letterAtOneToUpperCase = (value) => value.charAt(0).toUpperCase() + value.slice(1);
+
+exports.pathToFolder = (...selectedPath) => path.join(process.cwd(), ...selectedPath);
+
+exports.toCamelCase = value => value.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+
+exports.compose = (...functions) => (args) => functions.reduceRight((arg, fn) => fn(arg), args)
+
+exports.pipe = (...functions) => (args) => functions.reduce((arg, fn) => fn(arg), args)
+
+exports.writeFile = ({ folderPath, fileName, content }, cb) => {
   mkdirp(folderPath, (err) => {
     fs.writeFile(path.join(folderPath, fileName), content, cb);
   });
 
 }
 
-function objectToArray(object) {
- return Object.keys(object)
+exports.objectToArray = (object) => {
+  return Object.keys(object)
     .reduce((acc, curr) => {
       acc.push(object[curr]);
       return acc;
     }, []);
-}
-
-module.exports = {
-  letterAtOneToUpperCase,
-  writeFile,
-  pathToFolder,
-  objectToArray
 }
 
 // public static handleize(text): string

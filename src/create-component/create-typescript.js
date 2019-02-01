@@ -1,20 +1,26 @@
-const { letterAtOneToUpperCase, writeFile, pathToFolder } = require('../utils/utils');
+const { letterAtOneToUpperCase, pipe, toCamelCase, } = require('../utils/utils');
 const { angularImports, modelName, formModelImport, classHeader } = require('../utils/imports');
 
-function createComponentLogic({ componentName, method }) {
-  const modelConstructor = modelName(letterAtOneToUpperCase(componentName));
-  const model = formModelImport(modelConstructor, `${componentName}.model`);
+function createComponentLogic({ name }) {
 
-  const content = `;
+  const className = pipe(
+    toCamelCase,
+    letterAtOneToUpperCase
+  )(name);
+
+  const modelConstructor = modelName(className);
+  const model = formModelImport(modelConstructor, `${name}.model`);
+
+  const content = `
     ${angularImports('core', 'Component', 'OnInit')}
     ${angularImports('forms', 'FormBuilder', 'FormControl', 'FormGroup')}
     ${model}
     @Component({
-      selector: 'app-${componentName}',
-      templateUrl: './${componentName}.component.html',
-      styleUrls: ['./${componentName}.component.scss']
+      selector: 'app-${name}',
+      templateUrl: './${name}.component.html',
+      styleUrls: ['./${name}.component.scss']
     })
-    ${classHeader((letterAtOneToUpperCase(componentName) + 'Component'), 'OnInit')} {
+    ${classHeader((className + 'Component'), 'OnInit')} {
     Form: FormGroup;
 
     constructor(

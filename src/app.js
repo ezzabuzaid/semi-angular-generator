@@ -1,62 +1,83 @@
-const express = require('express');
-const app = express();
+
 const path = require('path');
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-
-const { writeFile, pathToFolder, objectToArray } = require('./utils/utils');
+const http = require('http');
+const static = require('node-static');
+const socketIo = require('socket.io');
+const portfinder = require('portfinder');
+const { writeFile, pathToFolder } = require('./utils/utils');
 const { createFormBuilderModel } = require('./models-types/class.model')
 const { createComponentLogic } = require('./create-component/create-typescript')
 const { createComponentTemplate } = require('./create-component/create-template');
 
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE');
-    res.header("Access-Control-Allow-Headers", "Origin, Authorization, X-Requested-With, Content-Type, Accept");
-    next();
-});
+function createComponent(fields, { name, path }) {
 
-function createComponent({ body }, res, next, options) {
+
     const write = (option) => {
         writeFile(option, () => { });
     }
 
-    const settings = { fields: objectToArray(body), componentName: options.name };
+    const settings = { fields, name };
 
     write({
-        fileName: `${options.name}.model.ts`,
-        folderPath: pathToFolder(options.folderPath, 'models'),
+        fileName: `${settings.name}.model.ts`,
+        folderPath: pathToFolder(path, 'models'),
         content: createFormBuilderModel(settings)
     });
 
     write({
-        fileName: `${options.name}.component.ts`,
-        folderPath: pathToFolder(options.folderPath, options.name),
+        fileName: `${settings.name}.component.ts`,
+        folderPath: pathToFolder(path, settings.name),
         content: createComponentLogic(settings)
     });
 
     write({
-        fileName: `${options.name}.component.html`,
-        folderPath: pathToFolder(options.folderPath, options.name),
+        fileName: `${settings.name}.component.html`,
+        folderPath: pathToFolder(path, settings.name),
         content: createComponentTemplate(settings)
     });
 
-    res.status(201).json({ created: true });
-}
-
-exports.initExpress = (name, folderPath) => {
-    app.post('/form', function () {
-        createComponent(...arguments, { name, folderPath })
+    write({
+        fileName: `${settings.name}.component.scss`,
+        folderPath: pathToFolder(path, settings.name),
+        content: ''
     });
 
+}
+
+exports.initExpress = (folderPath) => {
     const public = path.join(__dirname, '..', 'public');
 
-    app.get('/', function (req, res) {
-        res.sendFile(public);
+    function handler(request, response) {
+        const file = new static.Server(public);
+
+        request.addListener('end', function () {
+            file.serve(request, response);
+        }).resume();
+    }
+
+    const server = http.createServer(handler);
+
+    const io = socketIo(server);
+    io.on('connection', function (socket) {
+        socket.on('form', function ({ fields, name }) {
+            createComponent(fields, { name, path: folderPath });
+            socket.emit('form', 'Component created');
+        });
     });
 
-    app.use('/', express.static(public));
+    listen = (port) => {
+        return new Promise(resolve => {
+            server.listen(port, () => {
+                console.log(`Server running on http://${host}:${port}`);
+                resolve(port);
+            });
+        })
+    }
 
-    return app;
+    const host = 'localhost';
+    return portfinder.getPortPromise({ host })
+        .then(listen)
+        .then((port) => ({ port, host }));
 }
+
+process.chdir(path.join(process.cwd(), 'src', 'app'));

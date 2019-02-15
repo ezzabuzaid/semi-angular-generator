@@ -2,8 +2,9 @@
 const path = require('path');
 const http = require('http');
 const static = require('node-static');
-const socketIo = require('socket.io');
 const portfinder = require('portfinder');
+const WebSocket = require('ws');
+
 const { writeFile, pathToFolder } = require('./utils/utils');
 const { createFormBuilderModel } = require('./models-types/class.model')
 const { createComponentLogic } = require('./create-component/create-typescript')
@@ -44,7 +45,7 @@ function createComponent(fields, { name, path }) {
 
 }
 
-exports.initExpress = (folderPath) => {
+exports.initServer = (folderPath) => {
     const public = path.join(__dirname, '..', 'public');
 
     function handler(request, response) {
@@ -53,17 +54,28 @@ exports.initExpress = (folderPath) => {
         request.addListener('end', function () {
             file.serve(request, response);
         }).resume();
+
     }
 
     const server = http.createServer(handler);
 
-    const io = socketIo(server);
-    io.on('connection', function (socket) {
-        socket.on('form', function ({ fields, name }) {
+    const wss = new WebSocket.Server({ server });
+
+    wss.on('connection', function connection(ws) {
+        ws.on('message', function (model) {
+            const { fields, name } = JSON.parse(model);
             createComponent(fields, { name, path: folderPath });
-            socket.emit('form', 'Component created');
-        });
+            ws.send('Component created');
+        });;
     });
+
+    // const io = socketIo(server);
+    // io.on('connection', function (socket) {
+    //     socket.on('form', function ({ fields, name }) {
+    //         createComponent(fields, { name, path: folderPath });
+    //         socket.emit('form', 'Component created');
+    //     });
+    // });
 
     listen = (port) => {
         return new Promise(resolve => {

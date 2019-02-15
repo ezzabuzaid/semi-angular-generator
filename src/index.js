@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 const opn = require('opn');
-const { initExpress } = require('./app');
 const program = require('commander');
+const { initServer } = require('./app');
 
 function openBrowser(host) {
     return opn(`http://${host}`);
@@ -35,7 +35,7 @@ function utilizeArgs() {
 
 async function start(path) {
     try {
-        const server = await initExpress(path);
+        const server = await initServer(path);
         await openBrowser(`${server.host}:${server.port}`);
     } catch (error) {
         console.error(error);
@@ -43,7 +43,7 @@ async function start(path) {
 };
 
 program
-    .option('-p, --path <required>', 'The path where the file will be generated')
+    .option('-p, --path <required>', 'The folder path where the file will be generated')
     .action(({ path }) => {
         start(path);
     })

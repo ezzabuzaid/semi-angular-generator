@@ -1,6 +1,6 @@
 {
   "name": "@ezzabuzaid/angular-generator",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Forms Generator for angular based on material design",
   "main": "./src/index.js",
   "keywords": [

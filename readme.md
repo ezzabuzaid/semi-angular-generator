@@ -1,7 +1,7 @@
 
 # Generator for angular forms based on material design
 
-  
+## Porject is under development, a lot of features will be added soon
 
 ## `npm i -g @ezzabuzaid/angular-generator`
 
